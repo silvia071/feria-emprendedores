@@ -1,81 +1,100 @@
 package com.feria.modelos;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.feria.utils.Validadores;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Emprendedor {
 
-    public String n;      // nombre
-    public String id;     // identificador
-    public String t;      // teléfono
-    public String m;      // email
-    public String cat;    // categoria: comida, artesania, tecnologia, ropa
+  private String nombre;
+  private String id;
+  private String telefono;
+  private String email;
+  private String categoria;
+  private List<Producto> productos;
 
+  public Emprendedor(String nombre, String id, String telefono, String email, String categoria) {
+    this.nombre = nombre;
+    this.id = id;
+    this.telefono = telefono;
+    this.email = email;
+    this.categoria = categoria;
+    this.productos = new ArrayList<>();
+  }
 
-    public List<Producto> prods;
+  public String generarInformacion() {
+    StringBuilder informacion = new StringBuilder();
 
-    public Emprendedor(String nom, String id, String tel, String mail, String categoria) {
-        this.n = nom;
-        this.id = id;
-        this.t = tel;
-        this.m = mail;
-        this.cat = categoria;
-        this.prods = new ArrayList<>();
+    informacion.append("Emprendedor: ").append(nombre).append("\n");
+    informacion.append("ID: ").append(id).append("\n");
+    informacion.append("Contacto: ").append(telefono).append(" | ").append(email).append("\n");
+    informacion.append("Categoría: ").append(categoria).append("\n");
+    informacion.append("Productos:\n");
+
+    for (Producto producto : productos) {
+      informacion.append(" - ")
+          .append(producto.getNombre())
+          .append(" ($")
+          .append(producto.getPrecio())
+          .append(")\n");
     }
 
+    return informacion.toString();
+  }
 
-    public String mostrarInfoYValidar() {
-        String info = "Emprendedor: " + n + "\n";
-        info += "ID: " + id + "\n";
-        info += "Contacto: " + t + " | " + m + "\n";
-        info += "Categoría: " + cat + "\n";
+  public boolean esValido() {
+    return Validadores.validarEmprendedorCompleto(this);
+  }
 
-        // VALIDACIONES
-        if (n == null || n.length() < 2) {
-            info += "⚠️ NOMBRE DEMASIADO CORTO\n";
-        }
-        if (m == null || !m.contains("@")) {
-            info += "⚠️ EMAIL INVÁLIDO\n";
-        }
-        if (cat == null || (!cat.equals("comida") && !cat.equals("artesania") && 
-                           !cat.equals("tecnologia") && !cat.equals("ropa"))) {
-            info += "⚠️ CATEGORÍA DESCONOCIDA\n";
-        }
+  public void agregarProducto(Producto producto) {
+    if (producto != null) {
+      productos.add(producto);
+    }
+  }
 
-        info += "Productos:\n";
-        for (Producto p : prods) {
-            info += "  - " + p.nombre + " ($" + p.precio + ")\n";
-        }
+  public double calcularValorTotalStock() {
+    double total = 0;
 
-        return info;
+    for (Producto producto : productos) {
+      total += producto.valorTotal();
     }
 
+    return total;
+  }
 
-    public boolean validarCompleto() {
-        boolean valido = true;
-        if (n == null || n.length() < 2) valido = false;
-        if (m == null || !m.contains("@")) valido = false;
-        if (cat == null || (!cat.equals("comida") && !cat.equals("artesania") && 
-                           !cat.equals("tecnologia") && !cat.equals("ropa"))) valido = false;
-        return valido;
+  public boolean tieneProductoConStockBajo() {
+    for (Producto producto : productos) {
+      if (producto.tieneStockBajo()) {
+        return true;
+      }
     }
 
+    return false;
+  }
 
-    public String getNombre() {
-        return n;
-    }
+  public String getNombre() {
+    return nombre;
+  }
 
-    public void agregarProducto(Producto p) {
-        prods.add(p);
-    }
+  public String getId() {
+    return id;
+  }
 
+  public String getTelefono() {
+    return telefono;
+  }
 
-    public int calcularValorTotalStock() {
-        int total = 0;
-        for (Producto p : prods) {
-            total += p.precio * p.stock;
-        }
-        return total;
-    }
+  public String getEmail() {
+    return email;
+  }
+
+  public String getCategoria() {
+    return categoria;
+  }
+
+  public List<Producto> getProductos() {
+    return Collections.unmodifiableList(productos);
+  }
 }
