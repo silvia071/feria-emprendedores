@@ -3,22 +3,19 @@ package com.feria.servicios;
 import com.feria.modelos.Emprendedor;
 import com.feria.modelos.Producto;
 import com.feria.modelos.Venta;
-import com.feria.utils.Validadores;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class GestorFeria {
 
-  private List<Emprendedor> emprendedores;
-  private List<Producto> productos;
-  private List<Venta> ventas;
+  
+  private GestorEmprendedores gestorEmprendedores;
+  private GestorInventario gestorInventario;
+  private GestorVentas gestorVentas;
 
   public GestorFeria() {
-    this.emprendedores = new ArrayList<>();
-    this.productos = new ArrayList<>();
-    this.ventas = new ArrayList<>();
+    this.gestorEmprendedores = new GestorEmprendedores();
+    this.gestorInventario = new GestorInventario();
+    this.gestorVentas = new GestorVentas();
   }
 
   public void registrarEmprendedorConProductos(
@@ -30,14 +27,15 @@ public class GestorFeria {
       List<String> nombresProductos,
       List<Double> precios,
       List<Integer> stocks) {
-    if (!datosEmprendedorValidos(nombre, telefono, email, categoria)) {
+      
+    if (!gestorEmprendedores.datosEmprendedorValidos(nombre, telefono, email, categoria)) {
       return;
     }
 
     Emprendedor emprendedor = new Emprendedor(nombre, id, telefono, email, categoria);
 
     for (int i = 0; i < nombresProductos.size(); i++) {
-      Producto producto = crearProducto(
+      Producto producto = gestorInventario.crearProducto(
           nombresProductos.get(i),
           precios.get(i),
           stocks.get(i),
@@ -46,28 +44,25 @@ public class GestorFeria {
 
       if (producto != null) {
         emprendedor.agregarProducto(producto);
-        productos.add(producto);
+        gestorInventario.registrarProducto(producto);
       }
     }
 
-    emprendedores.add(emprendedor);
+    gestorEmprendedores.registrarEmprendedor(emprendedor);
     System.out.println("Emprendedor registrado con " + emprendedor.getProductos().size() + " productos");
   }
 
   public void registrarEmprendedor(Emprendedor emprendedor) {
     if (emprendedor != null && emprendedor.esValido()) {
-      emprendedores.add(emprendedor);
-
+      gestorEmprendedores.registrarEmprendedor(emprendedor);
       for (Producto producto : emprendedor.getProductos()) {
-        productos.add(producto);
+        gestorInventario.registrarProducto(producto);
       }
     }
   }
 
   public void registrarProducto(Producto producto) {
-    if (producto != null && Validadores.validarPrecioStock(producto.getPrecio(), producto.getStock())) {
-      productos.add(producto);
-    }
+    gestorInventario.registrarProducto(producto);
   }
 
   public void registrarVenta(
@@ -77,7 +72,8 @@ public class GestorFeria {
       int cantidad,
       double precio,
       String fecha) {
-    Producto productoEncontrado = buscarProducto(emprendedorId, productoNombre);
+      
+    Producto productoEncontrado = gestorInventario.buscarProducto(emprendedorId, productoNombre);
 
     if (productoEncontrado == null) {
       System.out.println("Producto no encontrado");
@@ -90,97 +86,30 @@ public class GestorFeria {
     }
 
     Venta venta = new Venta(idVenta, emprendedorId, productoNombre, cantidad, precio, fecha);
-    ventas.add(venta);
+    gestorVentas.registrarVenta(venta);
     productoEncontrado.descontarStock(cantidad);
 
     System.out.println("Venta registrada. Nuevo stock: " + productoEncontrado.getStock());
   }
 
   public List<Emprendedor> getEmprendedoresConStockBajo() {
-    List<Emprendedor> resultado = new ArrayList<>();
-
-    for (Emprendedor emprendedor : emprendedores) {
-      if (emprendedor.tieneProductoConStockBajo()) {
-        resultado.add(emprendedor);
-      }
-    }
-
-    return resultado;
+    return gestorEmprendedores.getEmprendedoresConStockBajo();
   }
 
   public void procesarVentasPendientesYCobrar() {
-    double totalRecaudado = 0;
-
-    for (Venta venta : ventas) {
-      if (venta.estaPendienteDePago()) {
-        double monto = venta.calcularTotalConDescuento();
-        totalRecaudado += monto;
-        venta.registrarPago();
-
-        System.out.println("Cobrada venta " + venta.getIdVenta() + " por $" + monto);
-      }
-    }
-
-    System.out.println("Total recaudado: $" + totalRecaudado);
+    gestorVentas.procesarVentasPendientesYCobrar();
   }
 
-  private boolean datosEmprendedorValidos(String nombre, String telefono, String email, String categoria) {
-    if (!Validadores.nombreValido(nombre)) {
-      System.out.println("Error: nombre inválido");
-      return false;
-    }
-
-    if (!Validadores.telefonoValido(telefono)) {
-      System.out.println("Error: teléfono inválido");
-      return false;
-    }
-
-    if (!Validadores.emailValido(email)) {
-      System.out.println("Error: email inválido");
-      return false;
-    }
-
-    if (!Validadores.categoriaPermitida(categoria)) {
-      System.out.println("Error: categoría inválida");
-      return false;
-    }
-
-    return true;
-  }
-
-  private Producto crearProducto(
-      String nombre,
-      double precio,
-      int stock,
-      String categoria,
-      String emprendedorId) {
-    if (!Validadores.validarPrecioStock(precio, stock)) {
-      System.out.println("Error: producto inválido");
-      return null;
-    }
-
-    return new Producto(nombre, precio, stock, categoria, emprendedorId);
-  }
-
-  private Producto buscarProducto(String emprendedorId, String productoNombre) {
-    for (Producto producto : productos) {
-      if (producto.perteneceA(emprendedorId) && producto.tieneNombre(productoNombre)) {
-        return producto;
-      }
-    }
-
-    return null;
-  }
-
+  // Los getters públicos delegan a cada módulo interno para no romper Reportes ni Main
   public List<Emprendedor> getEmprendedores() {
-    return Collections.unmodifiableList(emprendedores);
+    return gestorEmprendedores.getEmprendedores();
   }
 
   public List<Producto> getProductos() {
-    return Collections.unmodifiableList(productos);
+    return gestorInventario.getProductos();
   }
 
   public List<Venta> getVentas() {
-    return Collections.unmodifiableList(ventas);
+    return gestorVentas.getVentas();
   }
 }
