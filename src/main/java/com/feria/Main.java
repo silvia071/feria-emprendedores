@@ -49,7 +49,7 @@ public class Main {
     reportes.imprimirResumenEjecutivo(gestor);
 
     System.out.println(
-        "Emprendedor Ana válido? "
+        "Emprendedor Ana valido? "
             + Validadores.validarEmprendedorCompleto(gestor.getEmprendedores().get(0)));
 
     System.out.println(gestor.getEmprendedores().get(0).generarInformacion());

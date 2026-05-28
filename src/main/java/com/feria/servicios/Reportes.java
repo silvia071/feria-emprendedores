@@ -8,7 +8,7 @@ public class Reportes {
   public String generarReportePorCategoria(GestorFeria gestor, String categoria) {
     StringBuilder reporte = new StringBuilder();
 
-    reporte.append("=== REPORTE DE EMPRENDEDORES - CATEGORÍA: ")
+    reporte.append("=== REPORTE DE EMPRENDEDORES - CATEGORIA: ")
         .append(categoria)
         .append(" ===\n");
 

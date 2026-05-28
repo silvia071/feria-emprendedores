@@ -30,7 +30,7 @@ public class Emprendedor {
     informacion.append("Emprendedor: ").append(nombre).append("\n");
     informacion.append("ID: ").append(id).append("\n");
     informacion.append("Contacto: ").append(telefono).append(" | ").append(email).append("\n");
-    informacion.append("Categoría: ").append(categoria).append("\n");
+    informacion.append("Categoria: ").append(categoria).append("\n");
     informacion.append("Productos:\n");
 
     for (Producto producto : productos) {

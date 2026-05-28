@@ -21,19 +21,19 @@ public class GestorEmprendedores {
 
     public boolean datosEmprendedorValidos(String nombre, String telefono, String email, String categoria) {
         if (!Validadores.nombreValido(nombre)) {
-            System.out.println("Error: nombre inválido");
+            System.out.println("Error: nombre invalido");
             return false;
         }
         if (!Validadores.telefonoValido(telefono)) {
-            System.out.println("Error: teléfono inválido");
+            System.out.println("Error: teléfono invalido");
             return false;
         }
         if (!Validadores.emailValido(email)) {
-            System.out.println("Error: email inválido");
+            System.out.println("Error: email invalido");
             return false;
         }
         if (!Validadores.categoriaPermitida(categoria)) {
-            System.out.println("Error: categoría inválida");
+            System.out.println("Error: categoria invalida");
             return false;
         }
         return true;

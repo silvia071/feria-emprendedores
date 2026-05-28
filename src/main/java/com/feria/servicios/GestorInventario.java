@@ -21,7 +21,7 @@ public class GestorInventario {
 
     public Producto crearProducto(String nombre, double precio, int stock, String categoria, String emprendedorId) {
         if (!Validadores.validarPrecioStock(precio, stock)) {
-            System.out.println("Error: producto inválido");
+            System.out.println("Error: producto invalido");
             return null;
         }
         return new Producto(nombre, precio, stock, categoria, emprendedorId);
