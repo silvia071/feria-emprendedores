@@ -46,6 +46,10 @@ public class Producto {
     }
   }
 
+  public boolean esPremium() {
+    return precio > 10000;
+  }
+
   public String getNombre() {
     return nombre;
   }

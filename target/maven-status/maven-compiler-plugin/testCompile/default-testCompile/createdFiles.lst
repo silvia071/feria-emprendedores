@@ -1,0 +1,4 @@
+com\feria\utils\ValidadoresTest.class
+com\feria\modelos\ProductoTest.class
+com\feria\modelos\VentaTest.class
+com\feria\servicios\GestorVentasMockTest.class
