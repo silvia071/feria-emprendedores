@@ -35,7 +35,7 @@ steps:
   - name: Run Tests
     run: mvn test
 
-/prueba
+
 
 
 
